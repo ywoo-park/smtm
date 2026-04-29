@@ -7,10 +7,11 @@ import { HomeScreen } from './screens/HomeScreen'
 import { SimulationScreen } from './screens/SimulationScreen'
 import { WeddingScreen } from './screens/WeddingScreen'
 import { PropertyScreen } from './screens/PropertyScreen'
+import { LivingScreen } from './screens/LivingScreen'
 
 export default function App() {
   const { accessToken, user, signIn, signOut, isSignedIn, gisReady, autoLogging } = useGoogleAuth()
-  const { config, weddingItems, propertyItems, loading, error, updateWeddingItem, updatePropertyItem } = useAppData(accessToken)
+  const { config, weddingItems, propertyItems, livingData, loading, error, updateWeddingItem, updatePropertyItem } = useAppData(accessToken)
   const [activeTab, setActiveTab] = useState('home')
 
   if (autoLogging) {
@@ -63,6 +64,12 @@ export default function App() {
             config={config}
             propertyItems={propertyItems}
             updatePropertyItem={updatePropertyItem}
+            loading={loading}
+          />
+        )}
+        {activeTab === 'living' && (
+          <LivingScreen
+            livingData={livingData}
             loading={loading}
           />
         )}

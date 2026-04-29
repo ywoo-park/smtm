@@ -1022,3 +1022,120 @@ h1, h2, h3 { margin: 0; }
   padding-top: 10px;
   border-top: 1px solid var(--border);
 }
+
+/* ============================
+   생활비 화면
+   ============================ */
+.living-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4px 6px;
+}
+
+.living-col-label {
+  font-size: 11px;
+  color: var(--text-light);
+  font-weight: 600;
+  width: 72px;
+  text-align: right;
+}
+
+.living-section {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.living-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  padding: 10px 14px 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.living-section-items {
+  padding: 4px 0;
+}
+
+.living-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+}
+
+.living-row + .living-row {
+  border-top: 1px solid var(--border);
+}
+
+.living-row-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.living-row-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.living-row-type {
+  font-size: 11px;
+  color: var(--text-light);
+}
+
+.living-row-amounts {
+  display: flex;
+  align-items: center;
+}
+
+.living-row-person {
+  font-size: 13px;
+  color: var(--text-muted);
+  width: 72px;
+  text-align: right;
+}
+
+.living-row-total {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  width: 72px;
+  text-align: right;
+}
+
+.living-remaining {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 14px;
+  margin-top: 4px;
+}
+
+.living-remaining.neg-bg { background: var(--expense-bg); }
+.living-remaining.pos-bg { background: var(--positive-bg); }
+
+.living-remaining-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.living-remaining-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  width: 72px;
+  text-align: right;
+}
+
+.primary { color: var(--primary); }

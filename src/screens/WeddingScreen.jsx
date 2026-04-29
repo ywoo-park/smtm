@@ -12,7 +12,7 @@ function StatusBadge({ status }) {
   return <span className={`badge ${s.className}`}>{s.label}</span>
 }
 
-function WeddingItem({ item, index, onUpdate }) {
+function WeddingItem({ item, onUpdate }) {
   const [editing, setEditing] = useState(false)
   const [actualInput, setActualInput] = useState(item.actual?.toString() || '')
   const [saving, setSaving] = useState(false)
@@ -22,7 +22,7 @@ function WeddingItem({ item, index, onUpdate }) {
   const handleStatusChange = async (newStatus) => {
     setSaving(true)
     try {
-      await onUpdate(index, { status: newStatus })
+      await onUpdate(item.sheetRow, { status: newStatus })
     } finally {
       setSaving(false)
     }
@@ -32,7 +32,7 @@ function WeddingItem({ item, index, onUpdate }) {
     const num = parseInt(actualInput.replace(/[^0-9]/g, '')) || 0
     setSaving(true)
     try {
-      await onUpdate(index, { actual: num })
+      await onUpdate(item.sheetRow, { actual: num })
       setEditing(false)
     } finally {
       setSaving(false)
@@ -161,13 +161,11 @@ export function WeddingScreen({ weddingItems, updateWeddingItem, loading }) {
             <div key={cat} className="wedding-category-group">
               <p className="wedding-category-label">{cat}</p>
               {weddingItems
-                .map((item, idx) => ({ item, idx }))
-                .filter(({ item }) => item.category === cat)
-                .map(({ item, idx }) => (
+                .filter(item => item.category === cat)
+                .map(item => (
                   <WeddingItem
-                    key={idx}
+                    key={item.sheetRow}
                     item={item}
-                    index={idx}
                     onUpdate={updateWeddingItem}
                   />
                 ))
@@ -175,11 +173,10 @@ export function WeddingScreen({ weddingItems, updateWeddingItem, loading }) {
             </div>
           ))
         ) : (
-          weddingItems.map((item, idx) => (
+          weddingItems.map(item => (
             <WeddingItem
-              key={idx}
+              key={item.sheetRow}
               item={item}
-              index={idx}
               onUpdate={updateWeddingItem}
             />
           ))

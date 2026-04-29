@@ -44,6 +44,18 @@ const TABS = [
         <path d="M9 21V12H15V21" stroke={active ? 'white' : 'currentColor'} strokeWidth="2" strokeLinecap="round"/>
       </svg>
     )
+  },
+  {
+    id: 'living',
+    label: '생활비',
+    icon: (active) => (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9"
+          fill={active ? 'currentColor' : 'none'}
+          stroke="currentColor" strokeWidth="2"/>
+        <path d="M12 7V12L15 14" stroke={active ? 'white' : 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    )
   }
 ]
 

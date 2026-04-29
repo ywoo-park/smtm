@@ -7,13 +7,13 @@ const STATUS_LABELS = {
   '미납': { label: '미납', className: 'badge-pending' },
 }
 
-function PropertyItem({ item, index, onUpdate }) {
+function PropertyItem({ item, onUpdate }) {
   const [saving, setSaving] = useState(false)
 
   const handleStatus = async (status) => {
     setSaving(true)
     try {
-      await onUpdate(index, status)
+      await onUpdate(item.sheetRow, status)
     } finally {
       setSaving(false)
     }
@@ -131,11 +131,10 @@ export function PropertyScreen({ config, propertyItems, updatePropertyItem, load
         </div>
       ) : (
         <div className="property-items">
-          {propertyItems.map((item, idx) => (
+          {propertyItems.map(item => (
             <PropertyItem
-              key={idx}
+              key={item.sheetRow}
               item={item}
-              index={idx}
               onUpdate={updatePropertyItem}
             />
           ))}

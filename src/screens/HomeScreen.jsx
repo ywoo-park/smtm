@@ -25,8 +25,8 @@ export function HomeScreen({ config, weddingItems, propertyItems, loading, onSig
   const totalPropertyAmt = propertyItems.reduce((sum, item) => sum + item.amount, 0)
   const propertyProgress = totalPropertyAmt > 0 ? Math.round((propertyPaid / totalPropertyAmt) * 100) : 0
 
-  const progressPct = expectedAssets > currentAssets
-    ? Math.min(100, Math.round(((currentAssets - currentAssets) / (expectedAssets - currentAssets)) * 100))
+  const progressPct = expectedAssets > 0
+    ? Math.min(100, Math.round((currentAssets / expectedAssets) * 100))
     : 0
 
   if (loading) {
