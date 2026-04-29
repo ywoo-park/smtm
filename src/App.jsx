@@ -9,9 +9,17 @@ import { WeddingScreen } from './screens/WeddingScreen'
 import { PropertyScreen } from './screens/PropertyScreen'
 
 export default function App() {
-  const { accessToken, user, signIn, signOut, isSignedIn, gisReady } = useGoogleAuth()
+  const { accessToken, user, signIn, signOut, isSignedIn, gisReady, autoLogging } = useGoogleAuth()
   const { config, weddingItems, propertyItems, loading, error, updateWeddingItem, updatePropertyItem } = useAppData(accessToken)
   const [activeTab, setActiveTab] = useState('home')
+
+  if (autoLogging) {
+    return (
+      <div className="loading-screen" style={{ height: '100dvh' }}>
+        <div className="spinner" />
+      </div>
+    )
+  }
 
   if (!isSignedIn) {
     return <LoginScreen onSignIn={signIn} gisReady={gisReady} />
