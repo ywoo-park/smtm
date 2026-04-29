@@ -14,12 +14,12 @@ export function SimulationScreen({ config }) {
   const [months, setMonths] = useState(6)
   const [giftMoney, setGiftMoney] = useState(defaultGift)
   const [aptPrice, setAptPrice] = useState(defaultAptPrice)
+  const [interior, setInterior] = useState(50000000)
+  const [appliance, setAppliance] = useState(25000000)
 
-  const LIVING_COST = 75000000 // 인테리어 5000만 + 혼수가전 2500만
   const savingsTotal = monthlySaving * months
-  const adjustedMovingTotal = movingTotal + (aptPrice - defaultAptPrice)
-  const propertyCost = adjustedMovingTotal - LIVING_COST
-  const remainAfterAll = currentAssets + savingsTotal + giftMoney - weddingTotal - adjustedMovingTotal
+  const propertyCost = (movingTotal - 75000000) + (aptPrice - defaultAptPrice)
+  const remainAfterAll = currentAssets + savingsTotal + giftMoney - weddingTotal - propertyCost - interior - appliance
 
   const breakdown = [
     { label: '현재 자산', amount: currentAssets, type: 'pos' },
@@ -27,7 +27,8 @@ export function SimulationScreen({ config }) {
     { label: '축의금', amount: giftMoney, type: 'pos' },
     { label: '결혼비용', amount: -weddingTotal, type: 'neg' },
     { label: '매매 자기자본 (계약금·잔여·취득세)', amount: -propertyCost, type: 'neg' },
-    { label: '인테리어·혼수가전', amount: -LIVING_COST, type: 'neg' },
+    { label: '인테리어', amount: -interior, type: 'neg' },
+    { label: '혼수가전', amount: -appliance, type: 'neg' },
   ]
 
   return (
@@ -93,6 +94,50 @@ export function SimulationScreen({ config }) {
           <span>7억</span>
           <span>9.5억</span>
           <span>12억</span>
+        </div>
+      </div>
+
+      {/* 인테리어 슬라이더 */}
+      <div className="sim-card">
+        <div className="sim-field-header">
+          <p className="sim-field-label">인테리어</p>
+          <span className="sim-field-value">{formatKRW(interior)}</span>
+        </div>
+        <input
+          type="range"
+          className="slider"
+          min={0}
+          max={100000000}
+          step={5000000}
+          value={interior}
+          onChange={e => setInterior(Number(e.target.value))}
+        />
+        <div className="slider-labels">
+          <span>0</span>
+          <span>5000만</span>
+          <span>1억</span>
+        </div>
+      </div>
+
+      {/* 혼수가전 슬라이더 */}
+      <div className="sim-card">
+        <div className="sim-field-header">
+          <p className="sim-field-label">혼수가전</p>
+          <span className="sim-field-value">{formatKRW(appliance)}</span>
+        </div>
+        <input
+          type="range"
+          className="slider"
+          min={0}
+          max={60000000}
+          step={1000000}
+          value={appliance}
+          onChange={e => setAppliance(Number(e.target.value))}
+        />
+        <div className="slider-labels">
+          <span>0</span>
+          <span>3000만</span>
+          <span>6000만</span>
         </div>
       </div>
 
