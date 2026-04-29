@@ -9,11 +9,13 @@ export function HomeScreen({ config, weddingItems, propertyItems, loading, onSig
   const giftMoney = config.GIFT_MONEY || 0
   const weddingTotal = config.WEDDING_TOTAL || 0
   const movingTotal = config.MOVING_TOTAL || 0
+  const loanAmount = config.LOAN_AMOUNT || 0
+  const loanRate = config.LOAN_RATE || 0.052
 
   const dday = getDday(targetDate)
   const months = dday != null ? Math.max(0, Math.ceil(dday / 30)) : 6
-  const expectedAssets = currentAssets + monthlySaving * months
   const remainAfterAll = currentAssets + monthlySaving * months + giftMoney - weddingTotal - movingTotal
+  const monthlyInterest = Math.round(loanAmount * loanRate / 12)
 
   const weddingSpent = weddingItems.reduce((sum, item) => sum + (item.actual || 0), 0)
   const weddingBudget = weddingItems.reduce((sum, item) => sum + (item.budget || 0), 0)
@@ -24,10 +26,6 @@ export function HomeScreen({ config, weddingItems, propertyItems, loading, onSig
     .reduce((sum, item) => sum + item.amount, 0)
   const totalPropertyAmt = propertyItems.reduce((sum, item) => sum + item.amount, 0)
   const propertyProgress = totalPropertyAmt > 0 ? Math.round((propertyPaid / totalPropertyAmt) * 100) : 0
-
-  const progressPct = expectedAssets > 0
-    ? Math.min(100, Math.round((currentAssets / expectedAssets) * 100))
-    : 0
 
   if (loading) {
     return (
@@ -51,7 +49,6 @@ export function HomeScreen({ config, weddingItems, propertyItems, loading, onSig
             <span className="hero-user-name">{user?.name?.split(' ')[0] || '로그아웃'}</span>
           </div>
         </div>
-
         <div className="hero-members">
           <div className="hero-member">
             <span className="hero-member-name">영우</span>
@@ -63,41 +60,32 @@ export function HomeScreen({ config, weddingItems, propertyItems, loading, onSig
             <span className="hero-member-amount">{formatKRW(yuriAssets)}</span>
           </div>
         </div>
-
-        {dday != null && (
-          <div className="hero-dday">
-            <div className="hero-dday-bar-wrap">
-              <div className="hero-dday-bar">
-                <div className="hero-dday-bar-fill" style={{ width: `${progressPct}%` }} />
-              </div>
-            </div>
-            <div className="hero-dday-labels">
-              <span>현재</span>
-              <span className={`dday-badge ${dday < 0 ? 'dday-past' : ''}`}>
-                {dday >= 0 ? `D-${dday}` : `D+${Math.abs(dday)}`}
-              </span>
-              <span>{formatKRW(expectedAssets)}</span>
-            </div>
-          </div>
+        {targetDate && (
+          <p className="hero-date-hint">{targetDate} 기준</p>
         )}
       </div>
 
-      {/* 요약 카드 4개 */}
-      <div className="summary-grid">
-        <div className="summary-card">
-          <p className="summary-label">지출 후 잔여</p>
-          <p className={`summary-amount ${remainAfterAll < 0 ? 'neg' : 'pos'}`}>
-            {formatKRW(remainAfterAll)}
-          </p>
-          <p className="summary-sub">{months}개월 후 기준</p>
-        </div>
+      {/* 잔여 현금 전폭 카드 */}
+      <div className={`remain-card ${remainAfterAll < 0 ? 'remain-neg' : 'remain-pos'}`}>
+        <p className="remain-label">목표 시점 잔여 현금</p>
+        <p className="remain-amount">{formatKRW(remainAfterAll)}</p>
+        <p className="remain-sub">{months}개월 후 · 결혼+매매 후 기준</p>
+      </div>
 
+      {/* 요약 그리드 */}
+      <div className="summary-grid">
         <div className="summary-card">
           <p className="summary-label">결혼비용 잔여</p>
           <p className={`summary-amount ${weddingRemain < 0 ? 'neg' : ''}`}>
             {formatKRW(weddingRemain)}
           </p>
           <p className="summary-sub">총 {formatKRW(weddingBudget || weddingTotal)}</p>
+        </div>
+
+        <div className="summary-card">
+          <p className="summary-label">월 이자</p>
+          <p className="summary-amount neg">{formatKRW(monthlyInterest)}</p>
+          <p className="summary-sub">{(loanRate * 100).toFixed(1)}% 연이율</p>
         </div>
 
         <div className="summary-card">
