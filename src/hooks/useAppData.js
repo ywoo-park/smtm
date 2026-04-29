@@ -66,8 +66,8 @@ export function useAppData(accessToken) {
 
       // 카테고리 헤더 행이 중간에 있으므로 실제 시트 행 번호를 추적
       setWeddingItems(
-        weddingRows.slice(1)
-          .map((r, i) => ({ r, sheetRow: i + 2 }))
+        weddingRows.slice(2)
+          .map((r, i) => ({ r, sheetRow: i + 3 }))
           .filter(({ r }) => r && r[1])
           .map(({ r, sheetRow }) => ({
             sheetRow,
@@ -80,10 +80,10 @@ export function useAppData(accessToken) {
       )
 
       setPropertyItems(
-        propertyRows.slice(1)
+        propertyRows.slice(2)
           .filter(r => r && r[1])
           .map((r, i) => ({
-            sheetRow: i + 2,
+            sheetRow: i + 3,
             stage: r[0] || '',
             name: r[1] || '',
             amount: parseAmount(r[2]),
