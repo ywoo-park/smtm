@@ -60,9 +60,6 @@ export function HomeScreen({ config, weddingItems, propertyItems, loading, onSig
             <span className="hero-member-amount">{formatKRW(yuriAssets)}</span>
           </div>
         </div>
-        {targetDate && (
-          <p className="hero-date-hint">{targetDate} 기준</p>
-        )}
       </div>
 
       {/* 잔여 현금 전폭 카드 */}
