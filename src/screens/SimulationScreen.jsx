@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { formatKRW, formatKRWFull } from '../utils/format'
+import { formatKRW } from '../utils/format'
 
 const MONTH_OPTIONS = [3, 6, 9, 12]
 
@@ -9,20 +9,23 @@ export function SimulationScreen({ config }) {
   const defaultGift = config.GIFT_MONEY || 0
   const weddingTotal = config.WEDDING_TOTAL || 0
   const movingTotal = config.MOVING_TOTAL || 0
+  const defaultAptPrice = config.APT_PRICE || 850000000
 
   const [months, setMonths] = useState(6)
   const [giftMoney, setGiftMoney] = useState(defaultGift)
+  const [aptPrice, setAptPrice] = useState(defaultAptPrice)
 
   const savingsTotal = monthlySaving * months
-  const remainAfterAll = currentAssets + savingsTotal + giftMoney - weddingTotal - movingTotal
-  const netWeddingCost = weddingTotal - giftMoney
+  // 집값 변동분만큼 자기자본 부담이 늘어남 (대출은 고정)
+  const adjustedMovingTotal = movingTotal + (aptPrice - defaultAptPrice)
+  const remainAfterAll = currentAssets + savingsTotal + giftMoney - weddingTotal - adjustedMovingTotal
 
   const breakdown = [
     { label: '현재 자산', amount: currentAssets, type: 'pos' },
     { label: `월 적립 (${months}개월)`, amount: savingsTotal, type: 'pos' },
     { label: '축의금', amount: giftMoney, type: 'pos' },
     { label: '결혼비용', amount: -weddingTotal, type: 'neg' },
-    { label: '매매 자기자본', amount: -movingTotal, type: 'neg' },
+    { label: '매매 자기자본', amount: -adjustedMovingTotal, type: 'neg' },
   ]
 
   return (
@@ -69,6 +72,28 @@ export function SimulationScreen({ config }) {
         </div>
       </div>
 
+      {/* 집값 슬라이더 */}
+      <div className="sim-card">
+        <div className="sim-field-header">
+          <p className="sim-field-label">집값</p>
+          <span className="sim-field-value">{formatKRW(aptPrice)}</span>
+        </div>
+        <input
+          type="range"
+          className="slider"
+          min={700000000}
+          max={1200000000}
+          step={10000000}
+          value={aptPrice}
+          onChange={e => setAptPrice(Number(e.target.value))}
+        />
+        <div className="slider-labels">
+          <span>7억</span>
+          <span>9.5억</span>
+          <span>12억</span>
+        </div>
+      </div>
+
       {/* 결과 카드 */}
       <div className={`result-card ${remainAfterAll >= 0 ? 'result-pos' : 'result-neg'}`}>
         <p className="result-label">{months}개월 후 지출 후 잔여</p>
@@ -89,13 +114,6 @@ export function SimulationScreen({ config }) {
             </span>
           </div>
         ))}
-        <div className="breakdown-divider" />
-        <div className="breakdown-row breakdown-total">
-          <span className="breakdown-label">결혼비용 실부담</span>
-          <span className={`breakdown-amount ${netWeddingCost > 0 ? 'neg' : 'pos'}`}>
-            {formatKRW(-netWeddingCost)}
-          </span>
-        </div>
       </div>
     </div>
   )

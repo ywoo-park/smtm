@@ -104,23 +104,6 @@ export function useAppData(accessToken) {
     if (accessToken) load()
   }, [accessToken])
 
-  const updateWeddingItem = useCallback(async (sheetRow, { status, actual }) => {
-    const ops = []
-    if (actual !== undefined) {
-      ops.push(writeRange(`결혼비용!D${sheetRow}`, [[actual.toString()]]))
-    }
-    if (status !== undefined) {
-      ops.push(writeRange(`결혼비용!F${sheetRow}`, [[status]]))
-    }
-    await Promise.all(ops)
-    await load()
-  }, [writeRange, load])
-
-  const updatePropertyItem = useCallback(async (sheetRow, status) => {
-    await writeRange(`매매비용!F${sheetRow}`, [[status]])
-    await load()
-  }, [writeRange, load])
-
   return {
     config,
     weddingItems,
@@ -129,7 +112,5 @@ export function useAppData(accessToken) {
     loading,
     error,
     reload: load,
-    updateWeddingItem,
-    updatePropertyItem,
   }
 }

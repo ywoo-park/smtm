@@ -1,24 +1,14 @@
-import { useState } from 'react'
 import { formatKRW, formatKRWFull } from '../utils/format'
 
 const STATUS_LABELS = {
   '완료': { label: '납입 완료', className: 'badge-done' },
-  '예정': { label: '예정', className: 'badge-partial' },
+  '진행중': { label: '진행중', className: 'badge-partial' },
+  '대출': { label: '대출', className: 'badge-partial' },
+  '대기': { label: '대기', className: 'badge-pending' },
   '미납': { label: '미납', className: 'badge-pending' },
 }
 
-function PropertyItem({ item, onUpdate }) {
-  const [saving, setSaving] = useState(false)
-
-  const handleStatus = async (status) => {
-    setSaving(true)
-    try {
-      await onUpdate(item.sheetRow, status)
-    } finally {
-      setSaving(false)
-    }
-  }
-
+function PropertyItem({ item }) {
   const s = STATUS_LABELS[item.status] || STATUS_LABELS['미납']
 
   return (
@@ -33,23 +23,11 @@ function PropertyItem({ item, onUpdate }) {
           <span className={`badge ${s.className}`}>{s.label}</span>
         </div>
       </div>
-      <div className="property-item-actions">
-        {['미납', '예정', '완료'].map(st => (
-          <button
-            key={st}
-            className={`btn-sm ${item.status === st ? 'btn-primary' : 'btn-ghost'}`}
-            onClick={() => handleStatus(st)}
-            disabled={saving || item.status === st}
-          >
-            {st}
-          </button>
-        ))}
-      </div>
     </div>
   )
 }
 
-export function PropertyScreen({ config, propertyItems, updatePropertyItem, loading }) {
+export function PropertyScreen({ config, propertyItems, loading }) {
   const aptPrice = config.APT_PRICE || 0
   const loanAmount = config.LOAN_AMOUNT || 0
   const loanRate = config.LOAN_RATE || 0.052
@@ -78,7 +56,6 @@ export function PropertyScreen({ config, propertyItems, updatePropertyItem, load
         <h2 className="section-title">아파트 매매</h2>
       </div>
 
-      {/* 히어로 카드 */}
       <div className="property-hero">
         <div className="property-hero-row">
           <div className="property-hero-item">
@@ -96,7 +73,6 @@ export function PropertyScreen({ config, propertyItems, updatePropertyItem, load
         </div>
       </div>
 
-      {/* 대출 이자 */}
       <div className="loan-card">
         <div className="loan-card-row">
           <span className="loan-label">월 대출 이자</span>
@@ -112,7 +88,6 @@ export function PropertyScreen({ config, propertyItems, updatePropertyItem, load
         </div>
       </div>
 
-      {/* 납입 현황 */}
       <div className="property-progress-wrap">
         <div className="property-progress-header">
           <span>납입 현황</span>
@@ -123,20 +98,14 @@ export function PropertyScreen({ config, propertyItems, updatePropertyItem, load
         </div>
       </div>
 
-      {/* 항목 리스트 */}
       {propertyItems.length === 0 ? (
         <div className="empty-state">
           <p>매매비용 탭에 데이터를 입력해주세요</p>
-          <p className="empty-sub">단계·항목명·금액·상태 순서로 입력</p>
         </div>
       ) : (
         <div className="property-items">
           {propertyItems.map(item => (
-            <PropertyItem
-              key={item.sheetRow}
-              item={item}
-              onUpdate={updatePropertyItem}
-            />
+            <PropertyItem key={item.sheetRow} item={item} />
           ))}
         </div>
       )}
