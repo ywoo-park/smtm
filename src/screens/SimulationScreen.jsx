@@ -15,9 +15,10 @@ export function SimulationScreen({ config }) {
   const [giftMoney, setGiftMoney] = useState(defaultGift)
   const [aptPrice, setAptPrice] = useState(defaultAptPrice)
 
+  const LIVING_COST = 75000000 // 인테리어 5000만 + 혼수가전 2500만
   const savingsTotal = monthlySaving * months
-  // 집값 변동분만큼 자기자본 부담이 늘어남 (대출은 고정)
   const adjustedMovingTotal = movingTotal + (aptPrice - defaultAptPrice)
+  const propertyCost = adjustedMovingTotal - LIVING_COST
   const remainAfterAll = currentAssets + savingsTotal + giftMoney - weddingTotal - adjustedMovingTotal
 
   const breakdown = [
@@ -25,7 +26,8 @@ export function SimulationScreen({ config }) {
     { label: `월 적립 (${months}개월)`, amount: savingsTotal, type: 'pos' },
     { label: '축의금', amount: giftMoney, type: 'pos' },
     { label: '결혼비용', amount: -weddingTotal, type: 'neg' },
-    { label: '매매 자기자본', amount: -adjustedMovingTotal, type: 'neg' },
+    { label: '매매 자기자본 (계약금·잔여·취득세)', amount: -propertyCost, type: 'neg' },
+    { label: '인테리어·혼수가전', amount: -LIVING_COST, type: 'neg' },
   ]
 
   return (
