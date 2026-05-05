@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { useGoogleAuth } from './hooks/useGoogleAuth'
 import { useAppData } from './hooks/useAppData'
+import { usePropertyCandidates } from './hooks/usePropertyCandidates'
 import { LoginScreen } from './components/LoginScreen'
 import { BottomNav } from './components/BottomNav'
 import { HomeScreen } from './screens/HomeScreen'
 import { SimulationScreen } from './screens/SimulationScreen'
 import { WeddingScreen } from './screens/WeddingScreen'
 import { PropertyScreen } from './screens/PropertyScreen'
-import { LivingScreen } from './screens/LivingScreen'
+import { ProfitScreen } from './screens/ProfitScreen'
 
 export default function App() {
   const { accessToken, user, signIn, signOut, isSignedIn, gisReady, autoLogging } = useGoogleAuth()
@@ -15,6 +16,10 @@ export default function App() {
     config, weddingItems, propertyItems, livingData,
     loading, error, reload, updateWeddingActual, updatePropertyStatus,
   } = useAppData(accessToken)
+  const {
+    candidates, loading: profitLoading,
+    addCandidate, updateCandidate, deleteCandidate, reload: reloadCandidates,
+  } = usePropertyCandidates(accessToken)
   const [activeTab, setActiveTab] = useState('home')
 
   if (autoLogging) {
@@ -73,11 +78,15 @@ export default function App() {
             onReload={reload}
           />
         )}
-        {activeTab === 'living' && (
-          <LivingScreen
-            livingData={livingData}
-            loading={loading}
-            onReload={reload}
+        {activeTab === 'profit' && (
+          <ProfitScreen
+            config={config}
+            candidates={candidates}
+            loading={profitLoading}
+            onAdd={addCandidate}
+            onUpdate={updateCandidate}
+            onDelete={deleteCandidate}
+            onReload={reloadCandidates}
           />
         )}
       </div>

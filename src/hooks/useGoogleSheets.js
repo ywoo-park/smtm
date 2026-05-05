@@ -23,13 +23,51 @@ export function useGoogleSheets(accessToken) {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ values })
+        body: JSON.stringify({ values }),
       }
     )
     if (!res.ok) throw new Error(`Sheets write error: ${res.status}`)
   }, [accessToken])
 
-  return { readRange, writeRange }
+  const appendRange = useCallback(async (range, values) => {
+    const res = await fetch(
+      `${BASE}/values/${encodeURIComponent(range)}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ values }),
+      }
+    )
+    if (!res.ok) throw new Error(`Sheets append error: ${res.status}`)
+    return res.json()
+  }, [accessToken])
+
+  const batchUpdate = useCallback(async (requests) => {
+    const res = await fetch(`${BASE}:batchUpdate`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ requests }),
+    })
+    if (!res.ok) throw new Error(`Sheets batchUpdate error: ${res.status}`)
+    return res.json()
+  }, [accessToken])
+
+  const getSheets = useCallback(async () => {
+    const res = await fetch(`${BASE}?fields=sheets.properties`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    if (!res.ok) throw new Error(`Sheets meta error: ${res.status}`)
+    const data = await res.json()
+    return data.sheets || []
+  }, [accessToken])
+
+  return { readRange, writeRange, appendRange, batchUpdate, getSheets }
 }

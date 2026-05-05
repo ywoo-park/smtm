@@ -46,17 +46,22 @@ const TABS = [
     )
   },
   {
-    id: 'living',
-    label: '생활비',
+    id: 'profit',
+    label: '수익분석',
     icon: (active) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="9"
+        <rect x="3" y="13" width="4" height="8" rx="1"
           fill={active ? 'currentColor' : 'none'}
           stroke="currentColor" strokeWidth="2"/>
-        <path d="M12 7V12L15 14" stroke={active ? 'white' : 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <rect x="10" y="8" width="4" height="13" rx="1"
+          fill={active ? 'currentColor' : 'none'}
+          stroke="currentColor" strokeWidth="2"/>
+        <rect x="17" y="3" width="4" height="18" rx="1"
+          fill={active ? 'currentColor' : 'none'}
+          stroke="currentColor" strokeWidth="2"/>
       </svg>
     )
-  }
+  },
 ]
 
 export function BottomNav({ activeTab, onChange }) {
