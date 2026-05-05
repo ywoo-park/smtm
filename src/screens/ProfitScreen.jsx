@@ -16,7 +16,7 @@ function getAgentFee(price) {
   return price * 0.009
 }
 
-function calcProfit(candidate, appreciationRate, holdYears, interior) {
+function calcProfit(candidate, appreciationRate, holdYears) {
   const { price, loan, rate } = candidate
   const equity = price - loan
 
@@ -30,7 +30,7 @@ function calcProfit(candidate, appreciationRate, holdYears, interior) {
   const futurePrice = price * Math.pow(1 + appreciationRate, holdYears)
   const sellAgentFee = getAgentFee(futurePrice)
 
-  const totalDeductions = acquisitionTax + buyAgentFee + interior
+  const totalDeductions = acquisitionTax + buyAgentFee
     + annualHoldingCost * holdYears + sellAgentFee
   const capitalGain = futurePrice - price
   const netProfit = capitalGain - totalDeductions
@@ -48,10 +48,10 @@ function calcProfit(candidate, appreciationRate, holdYears, interior) {
   }
 }
 
-function YearChart({ candidate, appreciationRate, interior }) {
+function YearChart({ candidate, appreciationRate }) {
   const profits = CHART_YEARS.map(y => ({
     year: y,
-    profit: calcProfit(candidate, appreciationRate, y, interior).netProfit,
+    profit: calcProfit(candidate, appreciationRate, y).netProfit,
   }))
   const maxAbs = Math.max(...profits.map(p => Math.abs(p.profit)), 1)
 
@@ -75,13 +75,12 @@ function YearChart({ candidate, appreciationRate, interior }) {
   )
 }
 
-function CostBreakdown({ candidate, result, holdYears, interior }) {
+function CostBreakdown({ candidate, result, holdYears }) {
   const rows = [
     { label: `${holdYears}년 후 예상 매도가`, amount: result.futurePrice },
     { label: '현재 매수가', amount: -candidate.price },
     { label: '취득세', amount: -result.acquisitionTax },
     { label: '매수 중개수수료', amount: -result.buyAgentFee },
-    { label: '인테리어', amount: -interior },
     { label: `대출이자 (${holdYears}년)`, amount: -result.annualInterest * holdYears },
     { label: `재산세 (${holdYears}년)`, amount: -result.annualPropertyTax * holdYears },
     { label: '매도 중개수수료', amount: -result.sellAgentFee },
@@ -108,7 +107,7 @@ function CostBreakdown({ candidate, result, holdYears, interior }) {
   )
 }
 
-function CandidateCard({ candidate, appreciationRate, holdYears, interior, onDelete, onUpdate }) {
+function CandidateCard({ candidate, appreciationRate, holdYears, onDelete, onUpdate }) {
   const [expanded, setExpanded] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -116,7 +115,7 @@ function CandidateCard({ candidate, appreciationRate, holdYears, interior, onDel
   const [editForm, setEditForm] = useState(null)
   const [saving, setSaving] = useState(false)
 
-  const result = calcProfit(candidate, appreciationRate, holdYears, interior)
+  const result = calcProfit(candidate, appreciationRate, holdYears)
   const isPositive = result.netProfit >= 0
 
   const handleDelete = async () => {
@@ -175,10 +174,10 @@ function CandidateCard({ candidate, appreciationRate, holdYears, interior, onDel
       {expanded && !editing && (
         <div className="profit-card-detail">
           <p className="profit-detail-section-label">연도별 순수익</p>
-          <YearChart candidate={candidate} appreciationRate={appreciationRate} interior={interior} />
+          <YearChart candidate={candidate} appreciationRate={appreciationRate} />
 
           <p className="profit-detail-section-label">비용 내역</p>
-          <CostBreakdown candidate={candidate} result={result} holdYears={holdYears} interior={interior} />
+          <CostBreakdown candidate={candidate} result={result} holdYears={holdYears} />
 
           <div className="profit-card-actions">
             <button className="btn-sm btn-ghost" onClick={startEdit}>편집</button>
@@ -321,10 +320,10 @@ function AddCandidateForm({ onAdd, defaultRate }) {
   )
 }
 
-function CompareCard({ candidates, appreciationRate, holdYears, interior }) {
+function CompareCard({ candidates, appreciationRate, holdYears }) {
   const ranked = [...candidates].map(c => ({
     ...c,
-    result: calcProfit(c, appreciationRate, holdYears, interior),
+    result: calcProfit(c, appreciationRate, holdYears),
   })).sort((a, b) => b.result.netProfit - a.result.netProfit)
 
   const bestRate = [...ranked].sort((a, b) =>
@@ -359,7 +358,6 @@ function CompareCard({ candidates, appreciationRate, holdYears, interior }) {
 export function ProfitScreen({ config, candidates, loading, onAdd, onUpdate, onDelete, onReload }) {
   const [appreciationPct, setAppreciationPct] = useState(3)
   const [holdYears, setHoldYears] = useState(5)
-  const [interior, setInterior] = useState(50_000_000)
 
   const appreciationRate = appreciationPct / 100
   const defaultRate = config.LOAN_RATE || 0.045
@@ -425,35 +423,12 @@ export function ProfitScreen({ config, candidates, loading, onAdd, onUpdate, onD
         </div>
       </div>
 
-      {/* 인테리어 슬라이더 */}
-      <div className="sim-card">
-        <div className="sim-field-header">
-          <p className="sim-field-label">인테리어</p>
-          <span className="sim-field-value">{formatKRW(interior)}</span>
-        </div>
-        <input
-          type="range"
-          className="slider"
-          min={0}
-          max={100_000_000}
-          step={5_000_000}
-          value={interior}
-          onChange={e => setInterior(Number(e.target.value))}
-        />
-        <div className="slider-labels">
-          <span>0</span>
-          <span>5,000만</span>
-          <span>1억</span>
-        </div>
-      </div>
-
       {/* 비교 요약 */}
       {candidates.length >= 2 && (
         <CompareCard
           candidates={candidates}
           appreciationRate={appreciationRate}
           holdYears={holdYears}
-          interior={interior}
         />
       )}
 
@@ -470,7 +445,6 @@ export function ProfitScreen({ config, candidates, loading, onAdd, onUpdate, onD
             candidate={c}
             appreciationRate={appreciationRate}
             holdYears={holdYears}
-            interior={interior}
             onDelete={onDelete}
             onUpdate={onUpdate}
           />
