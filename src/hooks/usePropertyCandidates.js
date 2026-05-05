@@ -3,7 +3,7 @@ import { useGoogleSheets } from './useGoogleSheets'
 import { parseAmount } from '../utils/format'
 
 const SHEET_NAME = '후보단지'
-const HEADER = [['이름', '집값', '대출금', '금리', '인테리어', '메모']]
+const HEADER = [['이름', '집값', '대출금', '금리', '메모']]
 
 export function usePropertyCandidates(accessToken) {
   const { readRange, writeRange, appendRange, batchUpdate, getSheets } = useGoogleSheets(accessToken)
@@ -21,7 +21,7 @@ export function usePropertyCandidates(accessToken) {
       addSheet: { properties: { title: SHEET_NAME } },
     }])
     const newSheetId = result.replies[0].addSheet.properties.sheetId
-    await writeRange(`${SHEET_NAME}!A1:F1`, HEADER)
+    await writeRange(`${SHEET_NAME}!A1:E1`, HEADER)
     return newSheetId
   }, [getSheets, batchUpdate, writeRange])
 
@@ -35,7 +35,7 @@ export function usePropertyCandidates(accessToken) {
         setSheetId(sid)
         initialized.current = true
       }
-      const rows = await readRange(`${SHEET_NAME}!A:F`)
+      const rows = await readRange(`${SHEET_NAME}!A:E`)
       setCandidates(
         rows.slice(1)
           .map((r, i) => ({ r, sheetRow: i + 2 }))
@@ -46,8 +46,7 @@ export function usePropertyCandidates(accessToken) {
             price: parseAmount(r[1]),
             loan: parseAmount(r[2]),
             rate: parseAmount(r[3]) || 0.045,
-            interior: parseAmount(r[4]),
-            memo: r[5] || '',
+            memo: r[4] || '',
           }))
       )
     } finally {
@@ -60,24 +59,22 @@ export function usePropertyCandidates(accessToken) {
   }, [accessToken, load])
 
   const addCandidate = useCallback(async (candidate) => {
-    await appendRange(`${SHEET_NAME}!A:F`, [[
+    await appendRange(`${SHEET_NAME}!A:E`, [[
       candidate.name,
       candidate.price,
       candidate.loan,
       candidate.rate,
-      candidate.interior,
       candidate.memo || '',
     ]])
     await load()
   }, [appendRange, load])
 
   const updateCandidate = useCallback(async (sheetRow, candidate) => {
-    await writeRange(`${SHEET_NAME}!A${sheetRow}:F${sheetRow}`, [[
+    await writeRange(`${SHEET_NAME}!A${sheetRow}:E${sheetRow}`, [[
       candidate.name,
       candidate.price,
       candidate.loan,
       candidate.rate,
-      candidate.interior,
       candidate.memo || '',
     ]])
     await load()
