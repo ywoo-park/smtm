@@ -1,7 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { formatKRW } from '../utils/format'
 
 const MONTH_OPTIONS = [3, 6, 9, 12]
+
+// movingTotal(config)에 포함된 인테리어·혼수가전 기본값 — 별도 슬라이더로 분리되므로 중복 제거
+const INTERIOR_DEFAULT = 50_000_000
+const APPLIANCE_DEFAULT = 25_000_000
 
 export function SimulationScreen({ config }) {
   const currentAssets = config.CURRENT_ASSETS || 0
@@ -9,16 +13,25 @@ export function SimulationScreen({ config }) {
   const defaultGift = config.GIFT_MONEY || 0
   const weddingTotal = config.WEDDING_TOTAL || 0
   const movingTotal = config.MOVING_TOTAL || 0
-  const defaultAptPrice = config.APT_PRICE || 850000000
+  const defaultAptPrice = config.APT_PRICE || 850_000_000
 
   const [months, setMonths] = useState(6)
   const [giftMoney, setGiftMoney] = useState(defaultGift)
   const [aptPrice, setAptPrice] = useState(defaultAptPrice)
-  const [interior, setInterior] = useState(50000000)
-  const [appliance, setAppliance] = useState(25000000)
+  const [interior, setInterior] = useState(INTERIOR_DEFAULT)
+  const [appliance, setAppliance] = useState(APPLIANCE_DEFAULT)
+
+  // config가 비동기로 로드된 후 슬라이더 초기값을 동기화 (최초 1회)
+  const configSynced = useRef(false)
+  useEffect(() => {
+    if (configSynced.current || !config.GIFT_MONEY) return
+    configSynced.current = true
+    setGiftMoney(config.GIFT_MONEY || 0)
+    setAptPrice(config.APT_PRICE || 850_000_000)
+  }, [config])
 
   const savingsTotal = monthlySaving * months
-  const propertyCost = (movingTotal - 75000000) + (aptPrice - defaultAptPrice)
+  const propertyCost = (movingTotal - (INTERIOR_DEFAULT + APPLIANCE_DEFAULT)) + (aptPrice - defaultAptPrice)
   const remainAfterAll = currentAssets + savingsTotal + giftMoney - weddingTotal - propertyCost - interior - appliance
 
   const breakdown = [

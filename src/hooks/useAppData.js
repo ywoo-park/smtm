@@ -64,7 +64,6 @@ export function useAppData(accessToken) {
 
       setConfig(parseConfig(configRows))
 
-      // 카테고리 헤더 행이 중간에 있으므로 실제 시트 행 번호를 추적
       setWeddingItems(
         weddingRows.slice(2)
           .map((r, i) => ({ r, sheetRow: i + 3 }))
@@ -79,11 +78,13 @@ export function useAppData(accessToken) {
           }))
       )
 
+      // filter 전에 인덱스를 추적해야 실제 시트 행 번호가 정확함
       setPropertyItems(
         propertyRows.slice(2)
-          .filter(r => r && r[1])
-          .map((r, i) => ({
-            sheetRow: i + 3,
+          .map((r, i) => ({ r, sheetRow: i + 3 }))
+          .filter(({ r }) => r && r[1])
+          .map(({ r, sheetRow }) => ({
+            sheetRow,
             stage: r[0] || '',
             name: r[1] || '',
             amount: parseAmount(r[2]),
@@ -102,7 +103,17 @@ export function useAppData(accessToken) {
 
   useEffect(() => {
     if (accessToken) load()
-  }, [accessToken])
+  }, [accessToken, load])
+
+  const updateWeddingActual = useCallback(async (sheetRow, actual) => {
+    await writeRange(`결혼비용!D${sheetRow}`, [[actual.toString()]])
+    await load()
+  }, [writeRange, load])
+
+  const updatePropertyStatus = useCallback(async (sheetRow, status) => {
+    await writeRange(`매매비용!F${sheetRow}`, [[status]])
+    await load()
+  }, [writeRange, load])
 
   return {
     config,
@@ -112,5 +123,7 @@ export function useAppData(accessToken) {
     loading,
     error,
     reload: load,
+    updateWeddingActual,
+    updatePropertyStatus,
   }
 }

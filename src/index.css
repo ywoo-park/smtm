@@ -330,6 +330,21 @@ h1, h2, h3 { margin: 0; }
   color: var(--text-muted);
 }
 
+.badge-btn {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s;
+}
+
+.badge-btn:active {
+  opacity: 0.7;
+}
+
+.badge-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 /* 버튼 */
 .btn-primary {
   background: var(--primary);
@@ -403,11 +418,51 @@ h1, h2, h3 { margin: 0; }
   margin-bottom: 16px;
 }
 
+.section-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .section-title {
   font-size: 20px;
   font-weight: 700;
   color: var(--text);
   letter-spacing: -0.3px;
+}
+
+/* 새로고침 버튼 */
+.btn-refresh {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-refresh:active {
+  background: var(--border);
+}
+
+.btn-refresh:disabled {
+  opacity: 0.4;
+}
+
+.btn-refresh-hero {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.9);
+}
+
+.btn-refresh-hero:active {
+  background: rgba(255,255,255,0.25);
 }
 
 /* 빈 상태 */
@@ -441,6 +496,12 @@ h1, h2, h3 { margin: 0; }
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 16px;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .hero-label {
@@ -1034,6 +1095,13 @@ h1, h2, h3 { margin: 0; }
   margin-bottom: 2px;
 }
 
+.property-item-paid {
+  font-size: 12px;
+  color: var(--positive);
+  margin-top: 3px;
+  font-weight: 500;
+}
+
 .property-item-name {
   font-size: 15px;
   font-weight: 600;
@@ -1074,7 +1142,7 @@ h1, h2, h3 { margin: 0; }
   font-size: 11px;
   color: var(--text-light);
   font-weight: 600;
-  width: 72px;
+  min-width: 72px;
   text-align: right;
 }
 
@@ -1135,7 +1203,7 @@ h1, h2, h3 { margin: 0; }
 .living-row-person {
   font-size: 13px;
   color: var(--text-muted);
-  width: 72px;
+  min-width: 72px;
   text-align: right;
 }
 
@@ -1143,7 +1211,7 @@ h1, h2, h3 { margin: 0; }
   font-size: 14px;
   font-weight: 700;
   color: var(--text);
-  width: 72px;
+  min-width: 72px;
   text-align: right;
 }
 
@@ -1171,7 +1239,7 @@ h1, h2, h3 { margin: 0; }
   font-size: 14px;
   font-weight: 700;
   color: var(--text);
-  width: 72px;
+  min-width: 72px;
   text-align: right;
 }
 

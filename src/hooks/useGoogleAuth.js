@@ -4,6 +4,7 @@ const SCOPES = 'https://www.googleapis.com/auth/spreadsheets'
 const LS_TOKEN = 'smtm_token'
 const LS_EXPIRY = 'smtm_token_expiry'
 const LS_USER = 'smtm_user'
+const GIS_LOAD_TIMEOUT_MS = 5000
 
 function loadCachedSession() {
   try {
@@ -34,11 +35,13 @@ export function useGoogleAuth() {
   const [user, setUser] = useState(cached?.user ?? null)
   const [tokenClient, setTokenClient] = useState(null)
   const [gisReady, setGisReady] = useState(false)
-  // 초기 자동로그인 시도 중 여부 (캐시 없을 때)
   const [autoLogging, setAutoLogging] = useState(!cached)
   const silentAttempted = useRef(false)
 
   useEffect(() => {
+    let timer
+    let timeout
+
     const init = () => {
       const client = window.google.accounts.oauth2.initTokenClient({
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
@@ -60,7 +63,6 @@ export function useGoogleAuth() {
       setTokenClient(client)
       setGisReady(true)
 
-      // 캐시된 세션이 없을 때만 silent 자동로그인 시도
       if (!loadCachedSession() && !silentAttempted.current) {
         silentAttempted.current = true
         client.requestAccessToken({ prompt: 'none' })
@@ -71,13 +73,25 @@ export function useGoogleAuth() {
       init()
       return
     }
-    const timer = setInterval(() => {
+
+    // GIS 스크립트 로드 실패 시 무한 로딩 방지
+    timeout = setTimeout(() => {
+      clearInterval(timer)
+      setAutoLogging(false)
+    }, GIS_LOAD_TIMEOUT_MS)
+
+    timer = setInterval(() => {
       if (window.google?.accounts?.oauth2) {
+        clearTimeout(timeout)
         clearInterval(timer)
         init()
       }
     }, 100)
-    return () => clearInterval(timer)
+
+    return () => {
+      clearInterval(timer)
+      clearTimeout(timeout)
+    }
   }, [])
 
   const signIn = useCallback(() => {

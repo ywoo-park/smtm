@@ -1,4 +1,7 @@
+import { useState } from 'react'
 import { formatKRW, formatKRWFull } from '../utils/format'
+
+const STATUS_CYCLE = ['미납', '대기', '진행중', '완료']
 
 const STATUS_LABELS = {
   '완료': { label: '납입 완료', className: 'badge-done' },
@@ -8,8 +11,20 @@ const STATUS_LABELS = {
   '미납': { label: '미납', className: 'badge-pending' },
 }
 
-function PropertyItem({ item }) {
+function PropertyItem({ item, onUpdateStatus }) {
+  const [saving, setSaving] = useState(false)
   const s = STATUS_LABELS[item.status] || STATUS_LABELS['미납']
+
+  const handleStatusCycle = async () => {
+    const idx = STATUS_CYCLE.indexOf(item.status)
+    const next = STATUS_CYCLE[(idx + 1) % STATUS_CYCLE.length]
+    setSaving(true)
+    try {
+      await onUpdateStatus(item.sheetRow, next)
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
     <div className="property-item">
@@ -17,17 +32,26 @@ function PropertyItem({ item }) {
         <div>
           <p className="property-item-stage">{item.stage}</p>
           <p className="property-item-name">{item.name}</p>
+          {item.paidAmount > 0 && item.paidAmount !== item.amount && (
+            <p className="property-item-paid">납입 {formatKRW(item.paidAmount)}</p>
+          )}
         </div>
         <div className="property-item-right">
           <p className="property-item-amount">{formatKRW(item.amount)}</p>
-          <span className={`badge ${s.className}`}>{s.label}</span>
+          <button
+            className={`badge ${s.className} badge-btn`}
+            onClick={handleStatusCycle}
+            disabled={saving}
+          >
+            {saving ? '...' : s.label}
+          </button>
         </div>
       </div>
     </div>
   )
 }
 
-export function PropertyScreen({ config, propertyItems, loading }) {
+export function PropertyScreen({ config, propertyItems, loading, onUpdateStatus, onReload }) {
   const aptPrice = config.APT_PRICE || 0
   const loanAmount = config.LOAN_AMOUNT || 0
   const loanRate = config.LOAN_RATE || 0.052
@@ -52,8 +76,14 @@ export function PropertyScreen({ config, propertyItems, loading }) {
 
   return (
     <div className="screen">
-      <div className="section-header">
+      <div className="section-header section-header-row">
         <h2 className="section-title">아파트 매매</h2>
+        <button className="btn-refresh" onClick={onReload} disabled={loading} aria-label="새로고침">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+        </button>
       </div>
 
       <div className="property-hero">
@@ -105,7 +135,7 @@ export function PropertyScreen({ config, propertyItems, loading }) {
       ) : (
         <div className="property-items">
           {propertyItems.map(item => (
-            <PropertyItem key={item.sheetRow} item={item} />
+            <PropertyItem key={item.sheetRow} item={item} onUpdateStatus={onUpdateStatus} />
           ))}
         </div>
       )}

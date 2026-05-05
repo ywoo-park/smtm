@@ -11,7 +11,10 @@ import { LivingScreen } from './screens/LivingScreen'
 
 export default function App() {
   const { accessToken, user, signIn, signOut, isSignedIn, gisReady, autoLogging } = useGoogleAuth()
-  const { config, weddingItems, propertyItems, livingData, loading, error } = useAppData(accessToken)
+  const {
+    config, weddingItems, propertyItems, livingData,
+    loading, error, reload, updateWeddingActual, updatePropertyStatus,
+  } = useAppData(accessToken)
   const [activeTab, setActiveTab] = useState('home')
 
   if (autoLogging) {
@@ -47,6 +50,7 @@ export default function App() {
             loading={loading}
             user={user}
             onSignOut={signOut}
+            onReload={reload}
           />
         )}
         {activeTab === 'sim' && (
@@ -56,6 +60,8 @@ export default function App() {
           <WeddingScreen
             weddingItems={weddingItems}
             loading={loading}
+            onUpdateActual={updateWeddingActual}
+            onReload={reload}
           />
         )}
         {activeTab === 'property' && (
@@ -63,12 +69,15 @@ export default function App() {
             config={config}
             propertyItems={propertyItems}
             loading={loading}
+            onUpdateStatus={updatePropertyStatus}
+            onReload={reload}
           />
         )}
         {activeTab === 'living' && (
           <LivingScreen
             livingData={livingData}
             loading={loading}
+            onReload={reload}
           />
         )}
       </div>

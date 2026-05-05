@@ -23,7 +23,7 @@ function LivingRow({ item }) {
   )
 }
 
-export function LivingScreen({ livingData, loading }) {
+export function LivingScreen({ livingData, loading, onReload }) {
   const { sections, remaining } = livingData
 
   if (loading && sections.length === 0) {
@@ -37,8 +37,14 @@ export function LivingScreen({ livingData, loading }) {
 
   return (
     <div className="screen">
-      <div className="section-header">
+      <div className="section-header section-header-row">
         <h2 className="section-title">월 생활비</h2>
+        <button className="btn-refresh" onClick={onReload} disabled={loading} aria-label="새로고침">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+        </button>
       </div>
 
       <div className="living-header-row">

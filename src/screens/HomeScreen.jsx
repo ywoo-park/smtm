@@ -1,6 +1,6 @@
 import { formatKRW, getDday } from '../utils/format'
 
-export function HomeScreen({ config, weddingItems, propertyItems, loading, onSignOut, user }) {
+export function HomeScreen({ config, weddingItems, propertyItems, loading, onSignOut, user, onReload }) {
   const currentAssets = config.CURRENT_ASSETS || 0
   const youngAssets = config.YOUNG_ASSETS || 0
   const yuriAssets = config.YURI_ASSETS || 0
@@ -45,8 +45,16 @@ export function HomeScreen({ config, weddingItems, propertyItems, loading, onSig
             <p className="hero-label">합산 현재 자산</p>
             <h2 className="hero-amount">{formatKRW(currentAssets)}</h2>
           </div>
-          <div className="hero-user" onClick={onSignOut} title="로그아웃">
-            <span className="hero-user-name">{user?.name?.split(' ')[0] || '로그아웃'}</span>
+          <div className="hero-actions">
+            <button className="btn-refresh btn-refresh-hero" onClick={onReload} disabled={loading} aria-label="새로고침">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                <path d="M3 3v5h5"/>
+              </svg>
+            </button>
+            <div className="hero-user" onClick={onSignOut} title="로그아웃">
+              <span className="hero-user-name">{user?.name?.split(' ')[0] || '로그아웃'}</span>
+            </div>
           </div>
         </div>
         <div className="hero-members">
@@ -66,7 +74,9 @@ export function HomeScreen({ config, weddingItems, propertyItems, loading, onSig
       <div className={`remain-card ${remainAfterAll < 0 ? 'remain-neg' : 'remain-pos'}`}>
         <p className="remain-label">목표 시점 잔여 현금</p>
         <p className="remain-amount">{formatKRW(remainAfterAll)}</p>
-        <p className="remain-sub">{months}개월 후 · 결혼+매매 후 기준</p>
+        <p className="remain-sub">
+          {targetDate ? `${months}개월 후` : `기준일 미설정 (6개월 적용)`} · 결혼+매매 후 기준
+        </p>
       </div>
 
       {/* 요약 그리드 */}
