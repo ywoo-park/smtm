@@ -5,6 +5,7 @@ const LS_TOKEN = 'smtm_token'
 const LS_EXPIRY = 'smtm_token_expiry'
 const LS_USER = 'smtm_user'
 const GIS_LOAD_TIMEOUT_MS = 5000
+const SILENT_LOGIN_TIMEOUT_MS = 6000
 
 function loadCachedSession() {
   try {
@@ -37,6 +38,7 @@ export function useGoogleAuth() {
   const [gisReady, setGisReady] = useState(false)
   const [autoLogging, setAutoLogging] = useState(!cached)
   const silentAttempted = useRef(false)
+  const silentTimeout = useRef(null)
 
   useEffect(() => {
     let timer
@@ -47,6 +49,7 @@ export function useGoogleAuth() {
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
         scope: SCOPES,
         callback: async (response) => {
+          clearTimeout(silentTimeout.current)
           setAutoLogging(false)
           if (response.error) return
           try {
@@ -65,6 +68,7 @@ export function useGoogleAuth() {
 
       if (!loadCachedSession() && !silentAttempted.current) {
         silentAttempted.current = true
+        silentTimeout.current = setTimeout(() => setAutoLogging(false), SILENT_LOGIN_TIMEOUT_MS)
         client.requestAccessToken({ prompt: 'none' })
       }
     }
@@ -91,6 +95,7 @@ export function useGoogleAuth() {
     return () => {
       clearInterval(timer)
       clearTimeout(timeout)
+      clearTimeout(silentTimeout.current)
     }
   }, [])
 
