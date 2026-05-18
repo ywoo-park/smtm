@@ -20,6 +20,7 @@ export function SimulationScreen({ config, weddingItems = [], propertyItems = []
 
   const [months, setMonths] = useState(6)
   const [giftMoney, setGiftMoney] = useState(defaultGift)
+  const [parentSupport, setParentSupport] = useState(100_000_000)
   const [aptPrice, setAptPrice] = useState(defaultAptPrice)
   const [interior, setInterior] = useState(INTERIOR_DEFAULT)
   const [appliance, setAppliance] = useState(APPLIANCE_DEFAULT)
@@ -38,12 +39,13 @@ export function SimulationScreen({ config, weddingItems = [], propertyItems = []
   const effectiveAssets = currentAssets - paidWedding - paidProperty
   const weddingRemaining = weddingTotal - paidWedding
   const propertyRemaining = propertyCost - paidProperty
-  const remainAfterAll = effectiveAssets + savingsTotal + giftMoney - weddingRemaining - propertyRemaining - interior - appliance
+  const remainAfterAll = effectiveAssets + savingsTotal + giftMoney + parentSupport - weddingRemaining - propertyRemaining - interior - appliance
 
   const breakdown = [
     { label: '현재 자산 (기납입 제외)', amount: effectiveAssets, type: 'pos' },
     { label: `월 적립 (${months}개월)`, amount: savingsTotal, type: 'pos' },
     { label: '축의금', amount: giftMoney, type: 'pos' },
+    { label: '부모님 지원', amount: parentSupport, type: 'pos' },
     { label: '결혼비용 잔여', amount: -weddingRemaining, type: 'neg' },
     { label: '매매 자기자본 잔여', amount: -propertyRemaining, type: 'neg' },
     { label: '인테리어', amount: -interior, type: 'neg' },
@@ -91,6 +93,28 @@ export function SimulationScreen({ config, weddingItems = [], propertyItems = []
           <span>0</span>
           <span>5000만</span>
           <span>1억</span>
+        </div>
+      </div>
+
+      {/* 부모님 지원 슬라이더 */}
+      <div className="sim-card">
+        <div className="sim-field-header">
+          <p className="sim-field-label">부모님 지원</p>
+          <span className="sim-field-value">{formatKRW(parentSupport)}</span>
+        </div>
+        <input
+          type="range"
+          className="slider"
+          min={0}
+          max={300000000}
+          step={5000000}
+          value={parentSupport}
+          onChange={e => setParentSupport(Number(e.target.value))}
+        />
+        <div className="slider-labels">
+          <span>0</span>
+          <span>1.5억</span>
+          <span>3억</span>
         </div>
       </div>
 
