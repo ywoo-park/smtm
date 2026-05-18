@@ -7,13 +7,16 @@ const MONTH_OPTIONS = [3, 6, 9, 12]
 const INTERIOR_DEFAULT = 50_000_000
 const APPLIANCE_DEFAULT = 25_000_000
 
-export function SimulationScreen({ config }) {
+export function SimulationScreen({ config, weddingItems = [], propertyItems = [] }) {
   const currentAssets = config.CURRENT_ASSETS || 0
   const monthlySaving = config.MONTHLY_SAVING || 0
   const defaultGift = config.GIFT_MONEY || 0
   const weddingTotal = config.WEDDING_TOTAL || 0
   const movingTotal = config.MOVING_TOTAL || 0
   const defaultAptPrice = config.APT_PRICE || 850_000_000
+
+  const paidWedding = weddingItems.reduce((sum, item) => sum + (item.actual || 0), 0)
+  const paidProperty = propertyItems.reduce((sum, item) => sum + (item.paidAmount || 0), 0)
 
   const [months, setMonths] = useState(6)
   const [giftMoney, setGiftMoney] = useState(defaultGift)
@@ -32,14 +35,17 @@ export function SimulationScreen({ config }) {
 
   const savingsTotal = monthlySaving * months
   const propertyCost = (movingTotal - (INTERIOR_DEFAULT + APPLIANCE_DEFAULT)) + (aptPrice - defaultAptPrice)
-  const remainAfterAll = currentAssets + savingsTotal + giftMoney - weddingTotal - propertyCost - interior - appliance
+  const effectiveAssets = currentAssets - paidWedding - paidProperty
+  const weddingRemaining = weddingTotal - paidWedding
+  const propertyRemaining = propertyCost - paidProperty
+  const remainAfterAll = effectiveAssets + savingsTotal + giftMoney - weddingRemaining - propertyRemaining - interior - appliance
 
   const breakdown = [
-    { label: '현재 자산', amount: currentAssets, type: 'pos' },
+    { label: '현재 자산 (기납입 제외)', amount: effectiveAssets, type: 'pos' },
     { label: `월 적립 (${months}개월)`, amount: savingsTotal, type: 'pos' },
     { label: '축의금', amount: giftMoney, type: 'pos' },
-    { label: '결혼비용', amount: -weddingTotal, type: 'neg' },
-    { label: '매매 자기자본 (계약금·잔여·취득세)', amount: -propertyCost, type: 'neg' },
+    { label: '결혼비용 잔여', amount: -weddingRemaining, type: 'neg' },
+    { label: '매매 자기자본 잔여', amount: -propertyRemaining, type: 'neg' },
     { label: '인테리어', amount: -interior, type: 'neg' },
     { label: '혼수가전', amount: -appliance, type: 'neg' },
   ]

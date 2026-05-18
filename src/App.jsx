@@ -59,7 +59,11 @@ export default function App() {
           />
         )}
         {activeTab === 'sim' && (
-          <SimulationScreen config={config} />
+          <SimulationScreen
+            config={config}
+            weddingItems={weddingItems}
+            propertyItems={propertyItems}
+          />
         )}
         {activeTab === 'wedding' && (
           <WeddingScreen
